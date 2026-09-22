@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coin Empire</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#0b1020;color:#eef2ff}
+button,input{font:inherit}button{cursor:pointer}
+.wrap{max-width:980px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:30px}.muted{color:#9aa4bd;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.card{background:#131a2d;border:1px solid #29324a;border-radius:16px;padding:15px}
+.stat b{display:block;font-size:22px;margin-top:4px}
+.nav{display:flex;gap:7px;overflow:auto;margin-bottom:12px}.btn{background:#172038;color:#fff;border:1px solid #303b58;border-radius:10px;padding:10px 13px;min-height:42px;font-weight:700}.btn:hover{border-color:#7c8cff}.primary{background:#303d9c;border-color:#8793ff}
+.tab{display:none}.tab.active{display:block}
+.hero{text-align:center;padding:25px}.coin{width:165px;height:165px;border-radius:50%;border:5px solid #59657f;background:#ffd65a;font-size:52px;box-shadow:0 10px 35px #0007}.coin:active{transform:scale(.94)}
+.bar{height:8px;background:#202940;border-radius:99px;overflow:hidden;margin-top:9px}.fill{height:100%;background:#7c8cff;width:0}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #29324a;border-radius:12px;padding:12px;margin-top:8px}.item small{display:block;color:#9aa4bd;margin-top:3px}
+input{background:#0d1425;color:white;border:1px solid #303b58;border-radius:10px;padding:11px;width:100%}.row{display:flex;gap:8px;margin-top:9px}.notice{padding:12px;border:1px solid #303b58;border-radius:12px;margin-bottom:12px;background:#121a2c}.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#151d31;border:1px solid #425074;padding:11px 15px;border-radius:12px;display:none;z-index:9}.toast.show{display:block}
+@media(max-width:700px){.stats{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr}.coin{width:140px;height:140px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+<div class="top"><div><h1>🪙 Coin Empire</h1><div class="muted">Click • upgrade • collect • conquer</div></div><button class="btn" id="adminBtn">👑 Admin</button></div>
+<div id="notice" class="notice" style="display:none"></div>
+<div class="stats">
+<div class="card stat">🪙 Coins<b id="coins">0</b></div>
+<div class="card stat">💎 Gems<b id="gems">250</b></div>
+<div class="card stat">⭐ Level<b id="level">1</b></div>
+<div class="card stat">⚡ Power<b id="power">1</b></div>
+</div>
+<div class="nav">
+<button class="btn primary" data-tab="play">🎮 Play</button><button class="btn" data-tab="upgrades">⚡ Upgrades</button><button class="btn" data-tab="pets">🐾 Pets</button><button class="btn" data-tab="worlds">🌎 Worlds</button><button class="btn" data-tab="shop">🛒 Shop</button><button class="btn" data-tab="leader">🏆 Leaderboard</button>
+</div>
+<section id="play" class="tab active">
+<div class="card hero"><button class="coin" id="coin">🪙</button><h2>Click to earn!</h2><div class="muted" id="xp">XP 0 / 100</div><div class="bar"><div class="fill" id="xpbar"></div></div><p><span id="world">🌱 Starter World</span> · <span id="pet">🐾 No pet</span></p></div>
+<div class="cols"><div class="card"><b>🎁 Daily Reward</b><p class="muted" id="dailyText">Claim today's reward</p><button class="btn primary" id="daily">Claim +250 coins +25 gems</button></div>
+<div class="card"><b>🎲 Lucky Crate</b><p class="muted">Random reward</p><button class="btn" id="crate">Open · 100 coins</button></div></div>
+</section>
+<section id="upgrades" class="tab"><div class="card"><h2>⚡ Upgrades</h2>
+<div class="item"><div>👆 Strong Click<small>+1 base power</small></div><button class="btn" id="uc">25 🪙</button></div>
+<div class="item"><div>⛏️ Auto Miner<small>Coins every second</small></div><button class="btn" id="ua">100 🪙</button></div>
+<div class="item"><div>🚀 Multiplier<small>Double click power</small></div><button class="btn" id="um">500 🪙</button></div></div></section>
+<section id="pets" class="tab"><div class="card"><h2>🐾 Pets</h2><div id="pets"></div></div></section>
+<section id="worlds" class="tab"><div class="card"><h2>🌎 Worlds</h2><div id="worlds"></div></div></section>
+<section id="shop" class="tab"><div class="card"><h2>🛒 Gem Shop</h2>
+<div class="item"><div>🍀 Lucky Boost<small>+25% coins for 60 seconds</small></div><button class="btn" id="boost">75 💎</button></div>
+<div class="item"><div>🎟️ Rare Pet Ticket<small>Get a random pet</small></div><button class="btn" id="ticket">150 💎</button></div></div></section>
+<section id="leader" class="tab"><div class="card"><h2>🏆 Leaderboard</h2><div class="muted">Demo leaderboard. Live multiplayer comes later with a server.</div><div id="leaders"></div></div></section>
+<section id="admin" class="tab"><div class="card"><h2>👑 Admin Control Center</h2><div class="muted">Demo admin. Code: 1234</div>
+<div class="row"><input id="announce" placeholder="Global announcement"><button class="btn primary" id="send">📢 Send</button></div>
+<div class="row"><button class="btn" id="double">⚡ 2× Event</button><button class="btn" id="mega">🔥 5× Event</button><button class="btn" id="stop">⛔ Stop</button></div>
+<div class="row"><input id="give" type="number" min="1" placeholder="Coins geven"><button class="btn" id="giveBtn">💰 Give</button></div>
+<div class="row"><button class="btn" id="ag">💎 +1000 Gems</button><button class="btn" id="al">⭐ +5 Levels</button></div></div></section>
+<div class="toast" id="toast"></div>
+</div>
+<script>
+(()=>{const $=id=>document.getElementById(id);let coins=0,gems=250,xp=0,level=1,power=1,auto=0,multi=1,event=1,boost=1,world=0,pet=-1,daily=false;
+const pets=[['🐶','Dog',2],['🐱','Cat',5],['🐲','Dragon',15],['👽','Alien',40]];
+const worlds=[['🌱','Starter World',0,1],['🏜️','Desert World',5000,2],['🌋','Volcano World',50000,5],['🌌','Galaxy World',500000,12]];
+function f(n){return Math.floor(n).toLocaleString('nl-NL')}function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1700)}
+function petPower(){return pet<0?0:pets[pet][2]}
+function render(){ $('coins').textContent=f(coins);$('gems').textContent=f(gems);$('level').textContent=level;$('power').textContent=f((power+petPower())*multi*event*boost);$('xp').textContent='XP '+f(xp)+' / '+f(level*100);$('xpbar').style.width=Math.min(100,xp/(level*100)*100)+'%';$('world').textContent=worlds[world][0]+' '+worlds[world][1];$('pet').textContent=pet<0?'🐾 No pet':'🐾 '+pets[pet][1]+' +'+pets[pet][2];$('daily').disabled=daily;$('dailyText').textContent=daily?'Reward already claimed today!':"Claim today's reward";
+$('uc').textContent=f(25*level)+' 🪙';$('ua').textContent=f(100*level)+' 🪙';$('um').textContent=f(500*level)+' 🪙';
+$('pets').innerHTML=pets.map((p,i)=>`<div class="item"><div>${p[0]} <b>${p[1]}</b><small>Click bonus +${p[2]}</small></div><button class="btn" data-pet="${i}">${pet===i?'Equipped':'Equip'}</button></div>`).join('');
+document.querySelectorAll('[data-pet]').forEach(b=>b.onclick=()=>{pet=+b.dataset.pet;toast('🐾 Pet equipped!');render()});
+$('worlds').innerHTML=worlds.map((w,i)=>`<div class="item"><div>${w[0]} <b>${w[1]}</b><small>×${w[3]} rewards · requires ${f(w[2])} coins</small></div><button class="btn" data-world="${i}">${world===i?'Current':coins>=w[2]?'Enter':'Locked'}</button></div>`).join('');
+document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>{let i=+b.dataset.world;if(coins>=worlds[i][2]){world=i;toast('🌎 World entered!');render()}else toast('🔒 Not enough coins')});
+let ls=[['Nova',912000],['PixelKing',640000],['CoinMaster',420000],['LuckyFox',210000],['You',coins]].sort((a,b)=>b[1]-a[1]);$('leaders').innerHTML=ls.map((x,i)=>`<div class="item"><span>#${i+1} ${x[0]}</span><b>${f(x[1])} 🪙</b></div>`).join('')}
+function gain(n){n*=worlds[world][3];coins+=n;xp+=n;while(xp>=level*100){xp-=level*100;level++;toast('🎉 Level '+level+'!')}render()}
+$('coin').onclick=()=>gain((power+petPower())*multi*event*boost);
+$('uc').onclick=()=>{let c=25*level;if(coins>=c){coins-=c;power++;render()}else toast('Niet genoeg coins!')};
+$('ua').onclick=()=>{let c=100*level;if(coins>=c){coins-=c;auto++;render()}else toast('Niet genoeg coins!')};
+$('um').onclick=()=>{let c=500*level;if(coins>=c){coins-=c;multi*=2;render()}else toast('Niet genoeg coins!')};
+$('daily').onclick=()=>{if(!daily){daily=true;coins+=250;gems+=25;toast('🎁 Daily reward!');render()}};
+$('crate').onclick=()=>{if(coins<100)return toast('Niet genoeg coins!');coins-=100;let r=Math.random();if(r<.65){coins+=150;toast('🎲 +150 coins!')}else if(r<.9){gems+=50;toast('💎 +50 gems!')}else{pet=Math.floor(Math.random()*pets.length);toast('🐲 Rare pet gevonden!')}render()};
+$('boost').onclick=()=>{if(gems<75)return toast('Niet genoeg gems!');gems-=75;boost=1.25;toast('🍀 Boost actief!');setTimeout(()=>{boost=1;render()},60000);render()};
+$('ticket').onclick=()=>{if(gems<150)return toast('Niet genoeg gems!');gems-=150;pet=Math.floor(Math.random()*pets.length);toast('🎟️ '+pets[pet][1]+' unlocked!');render()};
+setInterval(()=>{if(auto)gain(auto*event)},1000);
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));$(b.dataset.tab).classList.add('active');document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('primary'));b.classList.add('primary')});
+let admin=false;$('adminBtn').onclick=()=>{if(!admin){let c=prompt('Admin code:');if(c!=='1234')return toast('Verkeerde code');admin=true}document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));$('admin').classList.add('active')};
+$('send').onclick=()=>{let t=$('announce').value.trim().slice(0,120);if(!t)return;$('notice').textContent='📢 GLOBAL: '+t;$('notice').style.display='block';$('announce').value='';toast('Announcement sent!')};
+function ev(n,s){event=n;toast('🔥 ×'+n+' event gestart!');clearTimeout(window.e);window.e=setTimeout(()=>{event=1;toast('Event afgelopen');render()},s*1000);render()}
+$('double').onclick=()=>ev(2,30);$('mega').onclick=()=>ev(5,20);$('stop').onclick=()=>{event=1;clearTimeout(window.e);toast('Event gestopt');render()};
+$('giveBtn').onclick=()=>{let n=Math.max(0,Math.floor(+$('give').value||0));coins+=n;$('give').value='';toast('💰 '+f(n)+' coins toegevoegd');render()};
+$('ag').onclick=()=>{gems+=1000;render();toast('💎 +1000 gems')};$('al').onclick=()=>{level+=5;render();toast('⭐ +5 levels')};render()})();
+</script>
+</body>
+</html>
